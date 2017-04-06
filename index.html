@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>CNVS</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<body>
+<canvas id="canvas" style="width: 800px; height: 800px; background: black;"></canvas>
+<script>
+
+    var canvas, ctx, img, allowDraw;
+
+    canvas = document.getElementById("canvas");
+    canvas.width = 800;
+    canvas.height = 800;
+    ctx = canvas.getContext('2d');
+
+    img = new Image;
+    img.src = 'brush.png';
+
+    allowDraw = false;
+
+    canvas.onmousedown = function(e) {
+        allowDraw = true;
+    };
+
+    canvas.onmouseup = function(e) {
+        allowDraw = false;
+    };
+
+	var angleBetween, distanceBetween;
+
+            distanceBetween = function(point1, point2) {
+              return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+            };
+
+            angleBetween = function(point1, point2) {
+              return Math.atan2(point2.x - point1.x, point2.y - point1.y);
+            };
+
+    canvas.onmousemove = function(e) {
+        if (allowDraw) {
+            ctx.drawImage(img, e.clientX, e.clientY);
+
+  currentPoint = {
+                x: e.clientX - canvas.getBoundingClientRect().left,
+                y: e.clientY - canvas.getBoundingClientRect().top
+              };
+              if (lastPoint != null) {
+                dist = distanceBetween(lastPoint, currentPoint);
+                angle = angleBetween(lastPoint, currentPoint);
+                i = 0;
+                while (i < dist) {
+                  x = lastPoint.x + Math.sin(angle) * i;
+                  y = lastPoint.y + Math.cos(angle) * i;
+                  ctx.drawImage(img, x, y);
+                  i++;
+                }
+              }
+              lastPoint = currentPoint;
+        } else {
+			lastPoint = null;
+		}
+    };
+
+    if (lastPoint != null) {
+        dist = distanceBetween(lastPoint, currentPoint);
+        angle = angleBetween(lastPoint, currentPoint);
+        i = 0;
+        while (i < dist) {
+            x = lastPoint.x + Math.sin(angle) * i;
+            y = lastPoint.y + Math.cos(angle) * i;
+            ctx.drawImage(img, x, y);
+            i++;
+        }
+    }
+    var isDrawing, lastPoint;
+
+    el.onmousedown = function(e) {
+        isDrawing = true;
+        lastPoint = { x: e.clientX, y: e.clientY };
+    };
+
+    el.onmousemove = function(e) {
+        if (!isDrawing) return;
+
+        var currentPoint = { x: e.clientX, y: e.clientY };
+        var dist = distanceBetween(lastPoint, currentPoint);
+        var angle = angleBetween(lastPoint, currentPoint);
+
+        for (var i = 0; i < dist; i++) {
+            x = lastPoint.x + (Math.sin(angle) * i) - 25;
+            y = lastPoint.y + (Math.cos(angle) * i) - 25;
+            ctx.drawImage(img, x, y);
+        }
+
+        lastPoint = currentPoint;
+    };
+
+    el.onmouseup = function() {
+        isDrawing = false;
+    };
+
+</script>
+</body>
+</html>
